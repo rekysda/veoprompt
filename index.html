@@ -1,1 +1,277 @@
-hallo
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generator Prompt Veo3</title>
+    <!-- Memuat Tailwind CSS untuk styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom scrollbar untuk tampilan yang lebih baik di tema gelap */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937; /* bg-gray-800 */
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; /* bg-gray-600 */
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; /* bg-gray-500 */
+        }
+        /* Style untuk panah dropdown pada select */
+        .custom-select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white font-sans">
+
+    <div class="container max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
+                Generator Prompt Veo3
+            </h1>
+            <p class="text-gray-400 mt-2">Buat prompt video sinematik dengan mudah dalam satu halaman.</p>
+        </header>
+
+        <!-- Layout Utama (Grid) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+
+            <!-- Kolom Kiri: Formulir -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
+                <form id="promptForm">
+                    <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-3 text-blue-300">Parameter Prompt</h2>
+                    
+                    <!-- Grup Form -->
+                    <div class="mb-4">
+                        <label for="subjek" class="block text-sm font-medium text-gray-400 mb-1">Subjek</label>
+                        <input type="text" id="subjek" name="subjek" value="seorang pria jawa berumur 20-30 tahun" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="aksi" class="block text-sm font-medium text-gray-400 mb-1">Aksi</label>
+                        <select id="aksi" name="aksi" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>terjun payung</option>
+                            <option>berlari di pantai</option>
+                            <option>mendaki gunung</option>
+                            <option>menyelam di laut</option>
+                            <option>memasak makanan tradisional</option>
+                            <option>bermain alat musik</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="ekspresi" class="block text-sm font-medium text-gray-400 mb-1">Ekspresi</label>
+                        <select id="ekspresi" name="ekspresi" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>bahagia dan tegang</option>
+                            <option>bahagia</option>
+                            <option>sedih</option>
+                            <option>marah</option>
+                            <option>terkejut</option>
+                            <option>tenang</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="tempat" class="block text-sm font-medium text-gray-400 mb-1">Tempat</label>
+                        <input type="text" id="tempat" name="tempat" value="persawahan di Jawa Tengah" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="waktu" class="block text-sm font-medium text-gray-400 mb-1">Waktu</label>
+                        <select id="waktu" name="waktu" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option>Pagi</option>
+                            <option>Siang</option>
+                            <option selected>Sore</option>
+                            <option>Malam</option>
+                            <option>Matahari terbit (Sunrise)</option>
+                            <option>Matahari terbenam (Sunset)</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="gerakan_kamera" class="block text-sm font-medium text-gray-400 mb-1">Gerakan Kamera</label>
+                        <select id="gerakan_kamera" name="gerakan_kamera" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>tracking shoot</option>
+                            <option>static shot</option>
+                            <option>panning shot</option>
+                            <option>tilt shot</option>
+                            <option>dolly shot</option>
+                            <option>drone shot</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="pencahayaan" class="block text-sm font-medium text-gray-400 mb-1">Pencahayaan</label>
+                        <select id="pencahayaan" name="pencahayaan" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>alami</option>
+                            <option>sinematik</option>
+                            <option>dramatis</option>
+                            <option>rembrandt</option>
+                            <option>low key</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="gaya_video" class="block text-sm font-medium text-gray-400 mb-1">Gaya Video</label>
+                        <select id="gaya_video" name="gaya_video" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>sinematik realistis</option>
+                            <option>dokumenter</option>
+                            <option>video musik</option>
+                            <option>film pendek</option>
+                            <option>vlog</option>
+                        </select>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="suasana_video" class="block text-sm font-medium text-gray-400 mb-1">Suasana Video</label>
+                        <select id="suasana_video" name="suasana_video" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>tegang dan kocak</option>
+                            <option>ceria</option>
+                            <option>sedih</option>
+                            <option>misterius</option>
+                            <option>romantis</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="suara_musik" class="block text-sm font-medium text-gray-400 mb-1">Suara atau Musik</label>
+                         <select id="suara_musik" name="suara_musik" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
+                            <option selected>suara noice di sekitar</option>
+                            <option>musik orkestra epik</option>
+                            <option>musik lo-fi tenang</option>
+                            <option>suara alam</option>
+                            <option>hening</option>
+                         </select>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="kalimat" class="block text-sm font-medium text-gray-400 mb-1">Kalimat yang Diucapkan</label>
+                        <textarea id="kalimat" name="kalimat" rows="2" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">bagaimana hasil prompt dari bang adhy ini, kren kan bi:</textarea>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="detail" class="block text-sm font-medium text-gray-400 mb-1">Detail Tambahan</label>
+                        <textarea id="detail" name="detail" rows="2" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">berbicara bahasa indonesia dengan logat jawa yang kental</textarea>
+                    </div>
+                    
+                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">
+                        Buat Prompt
+                    </button>
+                </form>
+            </div>
+
+            <!-- Kolom Kanan: Hasil -->
+            <div class="bg-gray-800 p-6 rounded-lg shadow-2xl h-full flex flex-col sticky top-8">
+                <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-3 text-teal-300">Hasil Prompt</h2>
+                <div class="relative flex-grow min-h-[300px]">
+                    <pre id="hasilPrompt" class="w-full h-full bg-gray-900 rounded-md p-4 whitespace-pre-wrap break-words text-gray-300 text-sm overflow-auto"></pre>
+                     <button id="copyButton" class="absolute top-[-5px] right-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-md text-sm transition-colors">
+                         Salin
+                     </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mengambil elemen-elemen yang diperlukan dari DOM
+            const form = document.getElementById('promptForm');
+            const hasilPromptDiv = document.getElementById('hasilPrompt');
+            const copyButton = document.getElementById('copyButton');
+            const formElements = form.elements;
+
+            // Fungsi untuk membuat prompt
+            const generatePrompt = () => {
+                // Membuat objek dari data form
+                const formData = {
+                    subjek: formElements.subjek.value,
+                    aksi: formElements.aksi.value,
+                    ekspresi: formElements.ekspresi.value,
+                    tempat: formElements.tempat.value,
+                    waktu: formElements.waktu.value,
+                    gerakan_kamera: formElements.gerakan_kamera.value,
+                    pencahayaan: formElements.pencahayaan.value,
+                    gaya_video: formElements.gaya_video.value,
+                    suasana_video: formElements.suasana_video.value,
+                    suara_musik: formElements.suara_musik.value,
+                    kalimat: formElements.kalimat.value,
+                    detail: formElements.detail.value,
+                };
+                
+                // Membuat string prompt gabungan
+                const finalPrompt = 
+`Subjek: ${formData.subjek}
+Aksi: ${formData.aksi}
+Ekspresi: ${formData.ekspresi}
+Tempat: ${formData.tempat}
+Waktu: ${formData.waktu}
+Gerakan Kamera: ${formData.gerakan_kamera}
+Pencahayaan: ${formData.pencahayaan}
+Gaya Video: ${formData.gaya_video}
+Suasana Video: ${formData.suasana_video}
+Suara atau Musik: ${formData.suara_musik}
+Kalimat yang Diucapkan: "${formData.kalimat}"
+Detail Tambahan: ${formData.detail}`;
+
+                // Menampilkan hasil di area "Hasil Prompt"
+                hasilPromptDiv.textContent = finalPrompt;
+            };
+
+            // Event listener untuk submit form
+            form.addEventListener('submit', function(event) {
+                event.preventDefault(); // Mencegah form dari reload halaman
+                generatePrompt();
+            });
+
+            // Event listener untuk menyalin ke clipboard
+            copyButton.addEventListener('click', function() {
+                const textToCopy = hasilPromptDiv.textContent;
+                
+                // Menggunakan Clipboard API modern jika tersedia
+                if (navigator.clipboard) {
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        // Memberi feedback visual bahwa teks telah disalin
+                        copyButton.textContent = 'Disalin!';
+                        setTimeout(() => {
+                            copyButton.textContent = 'Salin';
+                        }, 2000); // Reset teks tombol setelah 2 detik
+                    }).catch(err => {
+                        console.error('Gagal menyalin teks: ', err);
+                    });
+                } else {
+                    // Fallback untuk browser lama
+                    const textarea = document.createElement('textarea');
+                    textarea.value = textToCopy;
+                    document.body.appendChild(textarea);
+                    textarea.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(textarea);
+                    copyButton.textContent = 'Disalin!';
+                    setTimeout(() => {
+                        copyButton.textContent = 'Salin';
+                    }, 2000);
+                }
+            });
+
+            // Panggil fungsi generatePrompt saat halaman pertama kali dimuat
+            generatePrompt();
+        });
+    </script>
+
+</body>
+</html>
+
