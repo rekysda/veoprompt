@@ -3,275 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generator Prompt Veo3</title>
-    <!-- Memuat Tailwind CSS untuk styling -->
+    <title>Formulir Generator Prompt Veo</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom scrollbar untuk tampilan yang lebih baik di tema gelap */
-        ::-webkit-scrollbar {
-            width: 8px;
+        body {
+            font-family: 'Inter', sans-serif;
         }
-        ::-webkit-scrollbar-track {
-            background: #1f2937; /* bg-gray-800 */
+        /* Custom styles for better focus and transitions */
+        .form-input, .form-select {
+            transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #4b5563; /* bg-gray-600 */
-            border-radius: 4px;
+        .form-input:focus, .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.5);
+            outline: none;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6b7280; /* bg-gray-500 */
+        .radio-label {
+            transition: all 0.2s ease-in-out;
         }
-        /* Style untuk panah dropdown pada select */
-        .custom-select {
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%239ca3af' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
-            background-position: right 0.5rem center;
-            background-repeat: no-repeat;
-            background-size: 1.5em 1.5em;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+        input[type="radio"]:checked + .radio-label {
+            background-color: #4f46e5;
+            color: #ffffff;
+            border-color: #4338ca;
+        }
+        .btn {
+            transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+        }
+        .btn:hover {
+            opacity: 0.9;
+        }
+        .btn:active {
+            transform: scale(0.98);
+        }
+        .btn-primary {
+             background-color: #4f46e5;
+        }
+         .btn-primary:hover {
+             background-color: #4338ca;
+        }
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white font-sans">
-
-    <div class="container max-w-6xl mx-auto p-4 sm:p-6 lg:p-8">
-        
-        <!-- Header -->
+<body class="bg-gray-900 text-gray-200 p-4 sm:p-6 md:p-8">
+    <div class="max-w-4xl mx-auto">
         <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-500">
-                Generator Prompt Veo3
-            </h1>
-            <p class="text-gray-400 mt-2">Buat prompt video sinematik dengan mudah dalam satu halaman.</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-white">Generator Prompt Veo</h1>
+            <p class="mt-2 text-lg text-gray-400">Buat prompt video AI yang detail secara manual atau otomatis dari gambar.</p>
         </header>
 
-        <!-- Layout Utama (Grid) -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-            <!-- Kolom Kiri: Formulir -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-2xl">
-                <form id="promptForm">
-                    <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-3 text-blue-300">Parameter Prompt</h2>
-                    
-                    <!-- Grup Form -->
-                    <div class="mb-4">
-                        <label for="subjek" class="block text-sm font-medium text-gray-400 mb-1">Subjek</label>
-                        <input type="text" id="subjek" name="subjek" value="seorang pria jawa berumur 20-30 tahun" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <form id="veo-prompt-form" class="space-y-12">
+            <!-- Bagian Upload Gambar -->
+            <fieldset class="border border-gray-700 p-6 rounded-lg">
+                <legend class="text-xl font-semibold text-white px-2">Otomatis dari Gambar</legend>
+                <p class="text-sm text-gray-400 mb-4">Unggah foto untuk mengisi detail & adegan di bawah ini secara otomatis.</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                    <div>
+                        <label for="image-upload" class="btn btn-primary text-white font-bold py-2 px-4 rounded-lg cursor-pointer inline-block">
+                            Pilih File Gambar
+                        </label>
+                        <input type="file" id="image-upload" class="hidden" accept="image/png, image/jpeg, image/webp">
+                        <span id="file-name" class="ml-3 text-gray-400">Tidak ada file yang dipilih</span>
+                        <button type="button" id="analyze-image-btn" class="btn bg-indigo-500 text-white font-bold py-2 px-4 rounded-lg w-full mt-4 flex items-center justify-center" disabled>
+                            <span id="analyze-btn-text">Buat Prompt dari Gambar</span>
+                            <div id="analyze-loader" class="loader ml-3 hidden"></div>
+                        </button>
                     </div>
-
-                    <div class="mb-4">
-                        <label for="aksi" class="block text-sm font-medium text-gray-400 mb-1">Aksi</label>
-                        <select id="aksi" name="aksi" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>terjun payung</option>
-                            <option>berlari di pantai</option>
-                            <option>mendaki gunung</option>
-                            <option>menyelam di laut</option>
-                            <option>memasak makanan tradisional</option>
-                            <option>bermain alat musik</option>
-                        </select>
+                    <div>
+                        <img id="image-preview" src="https://placehold.co/400x300/1f2937/6b7280?text=Pratinjau+Gambar" alt="Pratinjau Gambar" class="w-full h-auto rounded-lg bg-gray-800 border border-gray-600">
                     </div>
-
-                    <div class="mb-4">
-                        <label for="ekspresi" class="block text-sm font-medium text-gray-400 mb-1">Ekspresi</label>
-                        <select id="ekspresi" name="ekspresi" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>bahagia dan tegang</option>
-                            <option>bahagia</option>
-                            <option>sedih</option>
-                            <option>marah</option>
-                            <option>terkejut</option>
-                            <option>tenang</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="tempat" class="block text-sm font-medium text-gray-400 mb-1">Tempat</label>
-                        <input type="text" id="tempat" name="tempat" value="persawahan di Jawa Tengah" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="waktu" class="block text-sm font-medium text-gray-400 mb-1">Waktu</label>
-                        <select id="waktu" name="waktu" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option>Pagi</option>
-                            <option>Siang</option>
-                            <option selected>Sore</option>
-                            <option>Malam</option>
-                            <option>Matahari terbit (Sunrise)</option>
-                            <option>Matahari terbenam (Sunset)</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="gerakan_kamera" class="block text-sm font-medium text-gray-400 mb-1">Gerakan Kamera</label>
-                        <select id="gerakan_kamera" name="gerakan_kamera" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>tracking shoot</option>
-                            <option>static shot</option>
-                            <option>panning shot</option>
-                            <option>tilt shot</option>
-                            <option>dolly shot</option>
-                            <option>drone shot</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="pencahayaan" class="block text-sm font-medium text-gray-400 mb-1">Pencahayaan</label>
-                        <select id="pencahayaan" name="pencahayaan" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>alami</option>
-                            <option>sinematik</option>
-                            <option>dramatis</option>
-                            <option>rembrandt</option>
-                            <option>low key</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="gaya_video" class="block text-sm font-medium text-gray-400 mb-1">Gaya Video</label>
-                        <select id="gaya_video" name="gaya_video" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>sinematik realistis</option>
-                            <option>dokumenter</option>
-                            <option>video musik</option>
-                            <option>film pendek</option>
-                            <option>vlog</option>
-                        </select>
-                    </div>
-                    
-                    <div class="mb-4">
-                        <label for="suasana_video" class="block text-sm font-medium text-gray-400 mb-1">Suasana Video</label>
-                        <select id="suasana_video" name="suasana_video" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>tegang dan kocak</option>
-                            <option>ceria</option>
-                            <option>sedih</option>
-                            <option>misterius</option>
-                            <option>romantis</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="suara_musik" class="block text-sm font-medium text-gray-400 mb-1">Suara atau Musik</label>
-                         <select id="suara_musik" name="suara_musik" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500 custom-select">
-                            <option selected>suara noice di sekitar</option>
-                            <option>musik orkestra epik</option>
-                            <option>musik lo-fi tenang</option>
-                            <option>suara alam</option>
-                            <option>hening</option>
-                         </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="kalimat" class="block text-sm font-medium text-gray-400 mb-1">Kalimat yang Diucapkan</label>
-                        <textarea id="kalimat" name="kalimat" rows="2" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">bagaimana hasil prompt dari bang adhy ini, kren kan bi:</textarea>
-                    </div>
-
-                    <div class="mb-4">
-                        <label for="detail" class="block text-sm font-medium text-gray-400 mb-1">Detail Tambahan</label>
-                        <textarea id="detail" name="detail" rows="2" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-md text-white focus:outline-none focus:ring-2 focus:ring-blue-500">berbicara bahasa indonesia dengan logat jawa yang kental</textarea>
-                    </div>
-                    
-                    <button type="submit" class="w-full mt-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-bold py-3 px-4 rounded-md shadow-lg transition-transform transform hover:scale-105">
-                        Buat Prompt
-                    </button>
-                </form>
-            </div>
-
-            <!-- Kolom Kanan: Hasil -->
-            <div class="bg-gray-800 p-6 rounded-lg shadow-2xl h-full flex flex-col sticky top-8">
-                <h2 class="text-2xl font-semibold mb-6 border-b border-gray-700 pb-3 text-teal-300">Hasil Prompt</h2>
-                <div class="relative flex-grow min-h-[300px]">
-                    <pre id="hasilPrompt" class="w-full h-full bg-gray-900 rounded-md p-4 whitespace-pre-wrap break-words text-gray-300 text-sm overflow-auto"></pre>
-                     <button id="copyButton" class="absolute top-[-5px] right-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-md text-sm transition-colors">
-                         Salin
-                     </button>
                 </div>
-            </div>
+                 <p id="error-message" class="text-red-400 text-sm mt-4 text-center"></p>
+            </fieldset>
 
+            <!-- Bagian 1: Detail Karakter & Adegan -->
+            <fieldset class="border border-gray-700 p-6 rounded-lg">
+                <legend class="text-xl font-semibold text-white px-2">Bagian 1: Detail Karakter & Adegan (Manual)</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                    <div class="space-y-6">
+                        <div>
+                            <label for="gaya_umum" class="block text-sm font-medium text-gray-300 mb-1">Gaya Umum</label>
+                            <input type="text" id="gaya_umum" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Sangat fotorealistis, sinematik" value="Sangat fotorealistis, sinematik, 4K">
+                        </div>
+                        <div>
+                            <label for="karakter" class="block text-sm font-medium text-gray-300 mb-1">Deskripsi Karakter Utama</label>
+                            <textarea id="karakter" rows="4" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Wanita muda 25 tahun, rambut hitam panjang, mengenakan gaun katun biru muda"></textarea>
+                        </div>
+                        <div>
+                            <label for="aksi" class="block text-sm font-medium text-gray-300 mb-1">Aksi & Emosi Karakter</label>
+                            <textarea id="aksi" rows="4" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Berjalan perlahan, tangannya menyentuh permukaan buah, tersenyum kecil"></textarea>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                         <div>
+                            <label for="lokasi" class="block text-sm font-medium text-gray-300 mb-1">Lokasi</label>
+                            <input type="text" id="lokasi" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Pasar tradisional di Bali, laboratorium futuristik">
+                        </div>
+                        <div>
+                            <label for="waktu" class="block text-sm font-medium text-gray-300 mb-1">Waktu & Cuaca</label>
+                            <input type="text" id="waktu" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Senja keemasan (golden hour), malam hari hujan gerimis">
+                        </div>
+                         <div>
+                            <label for="detail_penting" class="block text-sm font-medium text-gray-300 mb-1">Objek & Detail Penting</label>
+                            <textarea id="detail_penting" rows="4" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Tumpukan rempah-rempah berwarna-warni, jalanan basah memantulkan lampu neon"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Bagian 2: Pengaturan Kamera & Video -->
+            <fieldset class="border border-gray-700 p-6 rounded-lg">
+                <legend class="text-xl font-semibold text-white px-2">Bagian 2: Pengaturan Kamera & Video</legend>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-4">
+                    <div>
+                        <h3 class="text-md font-semibold text-gray-300 mb-2">Jenis Pengambilan Gambar</h3>
+                        <div class="flex flex-wrap gap-2">
+                            <input type="radio" name="shotType" id="shot_none" value="" class="hidden" checked>
+                            <label for="shot_none" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Default</label>
+                            <input type="radio" name="shotType" id="shot_establishing" value="Establishing shot" class="hidden">
+                            <label for="shot_establishing" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Establishing</label>
+                            <input type="radio" name="shotType" id="shot_wide" value="Wide shot" class="hidden">
+                            <label for="shot_wide" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Wide</label>
+                             <input type="radio" name="shotType" id="shot_medium" value="Medium shot" class="hidden">
+                            <label for="shot_medium" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Medium</label>
+                             <input type="radio" name="shotType" id="shot_closeup" value="Close-up" class="hidden">
+                            <label for="shot_closeup" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Close-up</label>
+                             <input type="radio" name="shotType" id="shot_pov" value="Point of View (POV)" class="hidden">
+                            <label for="shot_pov" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">POV</label>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-semibold text-gray-300 mb-2">Sudut Kamera</h3>
+                        <div class="flex flex-wrap gap-2">
+                             <input type="radio" name="cameraAngle" id="angle_none" value="" class="hidden" checked>
+                            <label for="angle_none" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Default</label>
+                             <input type="radio" name="cameraAngle" id="angle_eye" value="Eye-level" class="hidden">
+                            <label for="angle_eye" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Eye-Level</label>
+                             <input type="radio" name="cameraAngle" id="angle_low" value="Low angle" class="hidden">
+                            <label for="angle_low" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Low</label>
+                             <input type="radio" name="cameraAngle" id="angle_high" value="High angle" class="hidden">
+                            <label for="angle_high" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">High</label>
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-md font-semibold text-gray-300 mb-2">Gerakan Kamera</h3>
+                        <div class="flex flex-wrap gap-2">
+                             <input type="radio" name="cameraMovement" id="move_none" value="" class="hidden" checked>
+                            <label for="move_none" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Default</label>
+                            <input type="radio" name="cameraMovement" id="move_static" value="Static" class="hidden">
+                            <label for="move_static" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Static</label>
+                            <input type="radio" name="cameraMovement" id="move_pan" value="Pan" class="hidden">
+                            <label for="move_pan" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Pan</label>
+                            <input type="radio" name="cameraMovement" id="move_tilt" value="Tilt" class="hidden">
+                            <label for="move_tilt" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Tilt</label>
+                             <input type="radio" name="cameraMovement" id="move_dolly" value="Dolly/Tracking shot" class="hidden">
+                            <label for="move_dolly" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Dolly</label>
+                             <input type="radio" name="cameraMovement" id="move_handheld" value="Handheld" class="hidden">
+                            <label for="move_handheld" class="radio-label cursor-pointer border border-gray-600 bg-gray-800 rounded-full px-3 py-1 text-sm">Handheld</label>
+                        </div>
+                    </div>
+                </div>
+                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+                    <div>
+                        <label for="pencahayaan" class="block text-sm font-medium text-gray-300 mb-1">Pencahayaan</label>
+                        <input type="text" id="pencahayaan" class="form-input w-full bg-gray-800 border-gray-600 rounded-md p-2" placeholder="Contoh: Cahaya sore yang lembut, neon remang-remang">
+                    </div>
+                    <div>
+                        <label for="aspek_rasio" class="block text-sm font-medium text-gray-300 mb-1">Aspek Rasio</label>
+                        <select id="aspek_rasio" class="form-select w-full bg-gray-800 border-gray-600 rounded-md p-2">
+                            <option value="16:9 widescreen">16:9 (Widescreen)</option>
+                            <option value="9:16 vertical">9:16 (Vertikal)</option>
+                            <option value="1:1 square">1:1 (Persegi)</option>
+                            <option value="2.39:1 cinematic">2.39:1 (Cinematic)</option>
+                        </select>
+                    </div>
+                     <div>
+                        <label for="fps" class="block text-sm font-medium text-gray-300 mb-1">Frame Rate</label>
+                        <select id="fps" class="form-select w-full bg-gray-800 border-gray-600 rounded-md p-2">
+                            <option value="24fps">24fps (Film)</option>
+                            <option value="30fps">30fps (Standar)</option>
+                            <option value="60fps">60fps (Halus/Slow-mo)</option>
+                        </select>
+                    </div>
+                </div>
+            </fieldset>
+
+            <!-- Tombol Aksi -->
+            <div class="flex justify-center">
+                <button type="submit" class="btn btn-primary text-white font-bold py-3 px-8 rounded-lg text-lg">
+                    Buat Prompt Manual
+                </button>
+            </div>
+        </form>
+
+        <!-- Hasil Prompt -->
+        <div id="result-container" class="mt-12 hidden">
+             <h2 class="text-2xl font-semibold text-white text-center">Hasil Prompt</h2>
+             <div class="relative mt-4">
+                 <textarea id="generated-prompt" readonly class="w-full bg-gray-800 border border-gray-600 rounded-lg p-4 h-48 resize-none text-gray-300"></textarea>
+                 <button id="copy-button" class="absolute top-2 right-2 bg-gray-700 hover:bg-gray-600 text-gray-300 font-semibold py-1 px-3 rounded-md text-sm btn">Salin</button>
+             </div>
+             <p id="copy-feedback" class="text-center text-green-400 mt-2 h-4"></p>
         </div>
+
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Mengambil elemen-elemen yang diperlukan dari DOM
-            const form = document.getElementById('promptForm');
-            const hasilPromptDiv = document.getElementById('hasilPrompt');
-            const copyButton = document.getElementById('copyButton');
-            const formElements = form.elements;
+        // State
+        let imageBase64 = null;
+        const analyzeBtn = document.getElementById('analyze-image-btn');
+        const analyzeBtnText = document.getElementById('analyze-btn-text');
+        const analyzeLoader = document.getElementById('analyze-loader');
+        const errorMessage = document.getElementById('error-message');
 
-            // Fungsi untuk membuat prompt
-            const generatePrompt = () => {
-                // Membuat objek dari data form
-                const formData = {
-                    subjek: formElements.subjek.value,
-                    aksi: formElements.aksi.value,
-                    ekspresi: formElements.ekspresi.value,
-                    tempat: formElements.tempat.value,
-                    waktu: formElements.waktu.value,
-                    gerakan_kamera: formElements.gerakan_kamera.value,
-                    pencahayaan: formElements.pencahayaan.value,
-                    gaya_video: formElements.gaya_video.value,
-                    suasana_video: formElements.suasana_video.value,
-                    suara_musik: formElements.suara_musik.value,
-                    kalimat: formElements.kalimat.value,
-                    detail: formElements.detail.value,
-                };
-                
-                // Membuat string prompt gabungan
-                const finalPrompt = 
-`Subjek: ${formData.subjek}
-Aksi: ${formData.aksi}
-Ekspresi: ${formData.ekspresi}
-Tempat: ${formData.tempat}
-Waktu: ${formData.waktu}
-Gerakan Kamera: ${formData.gerakan_kamera}
-Pencahayaan: ${formData.pencahayaan}
-Gaya Video: ${formData.gaya_video}
-Suasana Video: ${formData.suasana_video}
-Suara atau Musik: ${formData.suara_musik}
-Kalimat yang Diucapkan: "${formData.kalimat}"
-Detail Tambahan: ${formData.detail}`;
+        // --- Fungsi untuk menangani upload gambar ---
+        const imageUpload = document.getElementById('image-upload');
+        imageUpload.addEventListener('change', function(event) {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+            
+            // Tampilkan nama file
+            document.getElementById('file-name').textContent = file.name;
 
-                // Menampilkan hasil di area "Hasil Prompt"
-                hasilPromptDiv.textContent = finalPrompt;
+            // Tampilkan pratinjau
+            const preview = document.getElementById('image-preview');
+            preview.src = URL.createObjectURL(file);
+            preview.onload = () => URL.revokeObjectURL(preview.src); // Bebaskan memori
+
+            // Konversi ke base64 untuk API
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                // Hapus header data URI
+                imageBase64 = reader.result.split(',')[1];
+                analyzeBtn.disabled = false;
+                analyzeBtn.classList.remove('bg-indigo-500');
+                analyzeBtn.classList.add('btn-primary');
+                errorMessage.textContent = '';
+            };
+            reader.readAsDataURL(file);
+        });
+
+        // --- Fungsi untuk menganalisis gambar dengan Gemini ---
+        analyzeBtn.addEventListener('click', async function() {
+            if (!imageBase64) {
+                errorMessage.textContent = 'Silakan pilih gambar terlebih dahulu.';
+                return;
+            }
+
+            // Tampilkan status loading
+            setLoading(true);
+
+            const promptText = `Deskripsikan gambar ini secara detail untuk prompt generator video. Jawab dalam format JSON. Fokus pada:
+            - "karakter": Deskripsi detail penampilan karakter utama (pakaian, rambut, perkiraan usia, ekspresi).
+            - "aksi": Aksi spesifik yang sedang dilakukan karakter dan emosinya.
+            - "lokasi": Deskripsi detail lingkungan atau lokasi.
+            - "waktu": Perkiraan waktu (pagi, siang, malam) dan cuaca.
+            - "detail": Objek atau detail penting lainnya di dalam adegan.
+            - "pencahayaan": Jelaskan gaya pencahayaan pada gambar (misal: cahaya alami, cahaya studio, remang-remang).`;
+            
+            const payload = {
+              contents: [{
+                role: "user",
+                parts: [
+                    { text: promptText },
+                    { inlineData: { mimeType: "image/jpeg", data: imageBase64 } }
+                ]
+              }],
+              generationConfig: {
+                  responseMimeType: "application/json",
+                  responseSchema: {
+                      type: "OBJECT",
+                      properties: {
+                          "karakter": { "type": "STRING" },
+                          "aksi": { "type": "STRING" },
+                          "lokasi": { "type": "STRING" },
+                          "waktu": { "type": "STRING" },
+                          "detail": { "type": "STRING" },
+                          "pencahayaan": { "type": "STRING" }
+                      }
+                  }
+              }
             };
 
-            // Event listener untuk submit form
-            form.addEventListener('submit', function(event) {
-                event.preventDefault(); // Mencegah form dari reload halaman
-                generatePrompt();
-            });
-
-            // Event listener untuk menyalin ke clipboard
-            copyButton.addEventListener('click', function() {
-                const textToCopy = hasilPromptDiv.textContent;
+            try {
+                const apiKey = ""; // API Key akan di-handle oleh environment
+                const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
                 
-                // Menggunakan Clipboard API modern jika tersedia
-                if (navigator.clipboard) {
-                    navigator.clipboard.writeText(textToCopy).then(() => {
-                        // Memberi feedback visual bahwa teks telah disalin
-                        copyButton.textContent = 'Disalin!';
-                        setTimeout(() => {
-                            copyButton.textContent = 'Salin';
-                        }, 2000); // Reset teks tombol setelah 2 detik
-                    }).catch(err => {
-                        console.error('Gagal menyalin teks: ', err);
-                    });
-                } else {
-                    // Fallback untuk browser lama
-                    const textarea = document.createElement('textarea');
-                    textarea.value = textToCopy;
-                    document.body.appendChild(textarea);
-                    textarea.select();
-                    document.execCommand('copy');
-                    document.body.removeChild(textarea);
-                    copyButton.textContent = 'Disalin!';
-                    setTimeout(() => {
-                        copyButton.textContent = 'Salin';
-                    }, 2000);
-                }
-            });
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
 
-            // Panggil fungsi generatePrompt saat halaman pertama kali dimuat
-            generatePrompt();
+                if (!response.ok) {
+                    throw new Error(`API call failed with status: ${response.status}`);
+                }
+
+                const result = await response.json();
+                const text = result.candidates[0].content.parts[0].text;
+                const parsedJson = JSON.parse(text);
+
+                // Isi form dengan hasil dari AI
+                document.getElementById('karakter').value = parsedJson.karakter || '';
+                document.getElementById('aksi').value = parsedJson.aksi || '';
+                document.getElementById('lokasi').value = parsedJson.lokasi || '';
+                document.getElementById('waktu').value = parsedJson.waktu || '';
+                document.getElementById('detail_penting').value = parsedJson.detail || '';
+                document.getElementById('pencahayaan').value = parsedJson.pencahayaan || '';
+                
+            } catch (error) {
+                console.error("Error:", error);
+                errorMessage.textContent = 'Gagal menganalisis gambar. Silakan coba lagi.';
+            } finally {
+                setLoading(false);
+            }
+        });
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                analyzeBtnText.textContent = 'Menganalisis...';
+                analyzeLoader.classList.remove('hidden');
+                analyzeBtn.disabled = true;
+                errorMessage.textContent = '';
+            } else {
+                analyzeBtnText.textContent = 'Buat Prompt dari Gambar';
+                analyzeLoader.classList.add('hidden');
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        // --- Event Listener untuk Form Manual ---
+        const form = document.getElementById('veo-prompt-form');
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+            generateManualPrompt();
+        });
+
+        // --- Fungsi untuk Membuat Prompt Manual---
+        function generateManualPrompt() {
+            const values = {
+                gaya: document.getElementById('gaya_umum').value.trim(),
+                karakter: document.getElementById('karakter').value.trim(),
+                aksi: document.getElementById('aksi').value.trim(),
+                lokasi: document.getElementById('lokasi').value.trim(),
+                waktu: document.getElementById('waktu').value.trim(),
+                detail: document.getElementById('detail_penting').value.trim(),
+                shotType: document.querySelector('input[name="shotType"]:checked').value,
+                cameraAngle: document.querySelector('input[name="cameraAngle"]:checked').value,
+                cameraMovement: document.querySelector('input[name="cameraMovement"]:checked').value,
+                aspectRatio: document.getElementById('aspek_rasio').value,
+                fps: document.getElementById('fps').value,
+                lighting: document.getElementById('pencahayaan').value.trim(),
+            };
+
+            let promptParts = [];
+            if (values.gaya) promptParts.push(values.gaya + ".");
+            
+            let sceneDesc = [];
+            if (values.karakter) sceneDesc.push(values.karakter);
+            if (values.aksi) sceneDesc.push(values.aksi);
+            if (values.lokasi) sceneDesc.push("di " + values.lokasi);
+            if (values.waktu) sceneDesc.push("pada " + values.waktu);
+            if (values.detail) sceneDesc.push(values.detail);
+            if (values.lighting && !sceneDesc.some(s => s.includes('pencahayaan'))) {
+                 sceneDesc.push("dengan pencahayaan " + values.lighting);
+            }
+            if (sceneDesc.length > 0) promptParts.push(sceneDesc.join(', ') + ".");
+
+            let cameraDesc = [];
+            if (values.shotType) cameraDesc.push(values.shotType);
+            if (values.cameraAngle) cameraDesc.push(values.cameraAngle);
+            if (values.cameraMovement) cameraDesc.push("dengan gerakan kamera " + values.cameraMovement);
+            if (values.aspectRatio) cameraDesc.push("dalam aspek rasio " + values.aspectRatio);
+            if (values.fps) cameraDesc.push(values.fps);
+
+            if(cameraDesc.length > 0) {
+                promptParts.push(cameraDesc.join(', ') + ".");
+            }
+            
+            const finalPrompt = promptParts.join(' ').replace(/, \./g, '.').replace(/\s+/g, ' ').trim();
+
+            const resultContainer = document.getElementById('result-container');
+            const promptTextarea = document.getElementById('generated-prompt');
+            promptTextarea.value = finalPrompt;
+            resultContainer.classList.remove('hidden');
+            resultContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        // --- Fungsi untuk Menyalin Teks ---
+        const copyButton = document.getElementById('copy-button');
+        const copyFeedback = document.getElementById('copy-feedback');
+        copyButton.addEventListener('click', function() {
+            const promptTextarea = document.getElementById('generated-prompt');
+            promptTextarea.select();
+            promptTextarea.setSelectionRange(0, 99999);
+            try {
+                document.execCommand('copy');
+                copyFeedback.textContent = 'Berhasil disalin!';
+                copyButton.textContent = 'Disalin!';
+                setTimeout(() => {
+                    copyFeedback.textContent = '';
+                    copyButton.textContent = 'Salin';
+                }, 2000);
+            } catch (err) {
+                 copyFeedback.textContent = 'Gagal menyalin.';
+            }
         });
     </script>
-
 </body>
 </html>
 
